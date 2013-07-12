@@ -1,0 +1,15 @@
+{
+    "name" : "spruce-bruce/entity",
+    "license": "MIT",
+    "type" : "kohana-module",
+    "authors": [
+        {
+            "name": "Aaron Bruce",
+            "homepage": "https://github.com/spruce-bruce",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "composer/installers": "~1.0"
+    }
+}
