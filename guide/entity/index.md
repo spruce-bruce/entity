@@ -1,6 +1,8 @@
 # Entity
 
-The Entity module is an extension of the Kohana ORM module which adds a paradigm for separating the idea of an ORM object that can be used to retrieve database records and perform batch actions on a group of records and an Entity object that represents a single record. I discuss advantages and disadvantages of this model on the [Motivation](motivation) page.
+The Entity module is an extension of the Kohana ORM system to make use of separate objects (Entities) to represent single records returned from the ORM functions.
+
+I discuss advantages and disadvantages of this model on the [Motivation](motivation) page.
 
 ## What?
 When using Kohana's ORM module you can make a call like `ORM::factory('User')->find_all()` which will perform a query that returns all of your users. The `find_all` call returns a `Database_Result` which in turn contains a result set of User ORM objects. When using the Entity module the `find_all` call returns an array of Entity objects. Entity objects are returned *if and only if* you have defined an entity object that partners with an ORM class. In our previous `find_all` example, if there is no User entity defined then it will return a normal Database_Result object with ORM objects.
