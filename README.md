@@ -5,4 +5,4 @@ This is an extension of the Kohana ORM system to make use of separate objects (E
 Further documentation to follow!
 
 ## TODO
-- Added Auth/Entity.php
+- Add Auth/Entity.php
