@@ -1,9 +1,7 @@
 
-## [entity]()
- - [Page name](page-path)
- - [This is a Category](category)
-     - [Sub Page](category/sub-page)
-     - [Another](category/another)
-         - [Sub sub page](category/another/sub-page)
- - Categories do not have to be a link to a page
-     - [Etcetera](etc)
+## [Entities]()
+- [Motivation](motivation)
+- [Basic Usage](basic-usage)
+- Examples
+    - [One Entity, Two ORM](examples/one-entity-two-orm)
+    - [Auth with user Entity](examples/auth-with-user-entity)

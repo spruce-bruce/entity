@@ -11,7 +11,7 @@ return array
             'enabled' => TRUE,
  
             // The name that should show up on the userguide index page
-            'name' => 'entity',
+            'name' => 'Entities',
  
             // A short description of this module, shown on the index page
             'description' => 'Entity modules extends the functionality of Kohana ORM.',
