@@ -14,7 +14,7 @@ Create a file called User.php in the `APPPATH/classes/Model` directory. Save the
 
 ~~~
 class Model_User extends ORM{
-    protected $_entity = "User";
+    
 }
 ~~~
 
@@ -37,7 +37,15 @@ class User extends Entity_User{
 }
 ~~~
 
-You can also follow the instructions on the [Non-Standard Entity Locations](examples/non-standard-entity-locations) page for how to create a `User` class without extending an `Entity_User` class.
+In addition you'll need to modify the User ORM class to point to the new Entity.
+
+~~~
+class Model_User extends ORM{
+    protected $_entity = "User";   
+}
+~~~
+
+Take a look at the [Non-Standard Entity Locations](examples/non-standard-entity-locations) page for further explanation of the `$_entity` variable.
 
 ## Getting an Entity Object
 This example assumes that you've completed Step 3 above. I will be referencing the `User` class rather than the `Entity_User` class.
