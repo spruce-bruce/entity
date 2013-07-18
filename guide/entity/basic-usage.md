@@ -14,7 +14,7 @@ Create a file called User.php in the `APPPATH/classes/Model` directory. Save the
 
 ~~~
 class Model_User extends ORM{
-
+    protected $_entity = "User";
 }
 ~~~
 
