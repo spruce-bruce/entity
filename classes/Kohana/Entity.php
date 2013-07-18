@@ -117,6 +117,7 @@ abstract class Kohana_Entity{
      * @param mixed $val 
      */
     public function __set($key, $val){
+        //set is called before __construct in some cases... wtf?
         if(!($this->_orm instanceof ORM)){
             $this->__construct();
         }
