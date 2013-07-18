@@ -77,7 +77,7 @@ class ORM extends Kohana_ORM {
 
         /*
          * if an entity isn't explicitly set we'll try to find one based
-         * on the model name. Model_Event means we're looking for the event
+         * on the model name. Model_Event means we're looking for the Event
          * entity, etc.
          */
         if(!$this->_entity){
@@ -86,7 +86,7 @@ class ORM extends Kohana_ORM {
 
             $class_type = array_shift($class_parts); // Expect this to be 'Model'
             $class_path = implode('/', $class_parts);
-            $entity_name = $class_parts[count($class_parts) - 1];
+            $entity_name = "Entity_" . $class_parts[count($class_parts) - 1];
             
             if(Kohana::find_file('classes', $class_path)){
                 $this->_entity = $entity_name;
