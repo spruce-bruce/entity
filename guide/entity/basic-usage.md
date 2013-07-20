@@ -67,8 +67,8 @@ $user = ORM::factory("User")->where('id', '=', '1')->find();
 
 -OR-
 ~~~
-$user = ORM::factory("User", 1); // I'm on the fence about whether or not this should 
-                                 // return an ORM object or an Entity object.
+$user = ORM::factory("User", 1); // I'm on the fence about whether or not this 
+                                 // should return an ORM object or an Entity object.
                                  // Send me feedback on github if you have an opinion.
 ~~~
 
