@@ -11,15 +11,16 @@ The main problem I set out to solve with the entity module can be summarized thu
 The result is the Entity module which extends the functionality of Kohana's ORM module. Entity objects do not extend the ORM class, instead each Entity object has a reference to an ORM object. Some methods and property access calls are passed directly to the Entity's ORM object, and some are restricted. You can't call query builder methods on an Entity object, for example. 
 
 ## Magic Beans
-Magic Beans is the title of Chapter 25 of the excellent book [SQL Antipatterns](http://www.amazon.com/SQL-Antipatterns-Programming-Pragmatic-Programmers/dp/1934356557) by Bill Karwin. This chapter is devoted to the problems that come from using Active Record objects as models. Karwin covers four problems in his book which I will quickly summarize here.
+Magic Beans is the title of Chapter 25 of the excellent book [SQL Antipatterns](http://www.amazon.com/SQL-Antipatterns-Programming-Pragmatic-Programmers/dp/1934356557) by Bill Karwin. This chapter is devoted to the problems that come from using Active Record objects as models. Karwin covers four problems in this chapter which I will quickly summarize here.
 
 1. Active Record couples models to schema
     - This may be the weaker of the four reasons because Kohana's ORM classes handle schema change quite well.
 2. Active Record exposes CRUD
-    - Because ORM objects are a query builder, any programmer with an ORM object can start making changes directly to the database. Kohana is flexible enough for us to limit this ourselves. The Entity module only just starts to address this, but not completely.
+    - Because an ORM object is a query builder, any programmer with an ORM object can start making changes directly to the database. Kohana is flexible enough for us to limit this ourselves. The Entity module only just starts to address this, but not completely.
 3. Active Record Encourages an Anemic Domain Model
     - Summarized, this problem is that active record models encourage using logic in controllers that is more appropriate in the model. The Entity module doesn't address this point.
 4. Unit testing is hard
+    - This is closely related to point 3. If you have code in controllers it's hard to unit test. It's also harder to unit test when you need a real database to test your objects.
 
 Karwin's book goes into greater detail, and I'd encourage anybody who is skeptical to check it out. Suffice it to say, I generally agree with Karwin's assessment. Karwin suggests a design solution: rather than having a model that *is* an active record you have a model that *has* an active record. He goes into detail in the book and I won't go any further here.
 
