@@ -92,7 +92,7 @@ $user->last_name = "Blow";
 $user->save();
 ~~~
 
-## Get an Entitie's ORM Object
+## Get an Entity's ORM Object
 Every entity object stores a reference to the ORM object that is backing it up. If you ever need the ORM object from an Entity simply call the `orm()` method.
 ~~~
 $user = new User(1);
