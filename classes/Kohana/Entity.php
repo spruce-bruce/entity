@@ -1,4 +1,5 @@
 <?php defined('SYSPATH') or die('No direct script access.');
+
 /**
  * Base class for "Entity" objects.
  * 
@@ -33,15 +34,22 @@ abstract class Kohana_Entity{
     protected $_relationships = array();
 
     /**
+     * track the history of the database values
+     * @var array 
+     * @deprecated
+     */
+    protected $val_history = array();
+
+    /**
      * Returns an array of all the '_col' members. The keys will be the name
      * of the member with the '_col' chopped off the end.
      *
      * @todo update to work with $this->_orm
      * @return array
      */
-    public function as_array(){
+    public function as_array($traverse = 0){
         if($this->_orm){
-            $data = $this->_orm->as_array();
+            $data = $this->_orm->as_array($traverse);
         }else{
             $data = array();
             foreach($this as $key=>$val){
@@ -51,10 +59,6 @@ abstract class Kohana_Entity{
             }
         }
         return $data;
-    }
-
-    public function orm(){
-        return $this->_orm;
     }
 
     public function __toString(){
@@ -117,14 +121,10 @@ abstract class Kohana_Entity{
      * @param mixed $val 
      */
     public function __set($key, $val){
-        //set is called before __construct in some cases... wtf?
-        if(!($this->_orm instanceof ORM)){
-            $this->__construct();
-        }
         if($this->_orm instanceof ORM){
             $this->_orm->{$key} = $val;
         }else{
-            throw new Missing_ORM_Exception("There is no ORM object linked to this Entity instance");
+            throw new Missing_ORM_Exception();
         }
     }
 
@@ -140,6 +140,7 @@ abstract class Kohana_Entity{
      */
     public function __call($name, $arguments){
         $success = false;
+        $convert_orm_to_entity = false;
 
         if(!$this->_orm){
             throw new Missing_ORM_Exception("There is no ORM object linked to this Entity instance");
@@ -152,6 +153,7 @@ abstract class Kohana_Entity{
                     throw new Entity_Call_Exception("The $name() method requires 2 arguments.");
                 }
                 $success = true;
+                $convert_orm_to_entity = true;
                 break;
             case "has":
             case "remove":
@@ -159,19 +161,25 @@ abstract class Kohana_Entity{
                     throw new Entity_Call_Exception("The $name() method requires at least one argument.");
                 }
 
-                if($arguments[0] instanceof Entity){
-                    $arguments[0] = $arguments[0]->orm();
-                }
-
                 $success = true;
+                $convert_orm_to_entity = true;
                 break;
             case "loaded":
-            case "pk": 
-            case "save":
+            case "delete":
                 $success = true;
                 break;
             default :
                 throw new Entity_Call_Exception("The $name() method does not exist or is not supported.");
+        }
+
+        /* Convert Entity Arguments to ORM if needed
+        //---------------------------------------*/
+        if($convert_orm_to_entity) {
+            foreach($arguments as &$argument) {
+                if($argument instanceof Entity) {
+                    $argument = $argument->orm();
+                }
+            }
         }
 
         //if args are correct and we explicitly handle this function then we can pass the
@@ -216,21 +224,35 @@ abstract class Kohana_Entity{
             //---------------------------------------*/
             $this->_orm = $arg;
 
-        } else if(is_numeric($arg)) {
-
-            /* The Argument is an ID. Create the ORM object
+        } else if($arg) {
+            /* Argument is set, we assume that it's an ID of some sort (string or int)
             //---------------------------------------*/
-            // Get the ID
-            $id = filter_var($arg, FILTER_SANITIZE_NUMBER_INT);
-            // Set it
-            if($this->_orm && $id) { 
-                $this->_orm = new $this->_orm($id);
+            if($this->_orm && $arg) { 
+                $this->_orm = new $this->_orm($arg);
             }
 
-        } else if(!($this->_orm instanceof ORM)) {
+        } else {
             /* Argument is default, create a blank ORM
             //---------------------------------------*/
             $this->_orm = new $this->_orm();
+        }
+    }
+
+    public function values($post){
+        if($this->_orm){
+            $this->_orm->values($post);
+            return $this; // Chain the Entity, not the ORM object
+        }else{
+            throw new Missing_ORM_Exception("There is no ORM object linked to this Entity instance");
+        }
+    }
+
+    public function save(){
+        if($this->_orm){
+            $this->_orm->save();
+            return $this; // Chain the Entity, not the ORM object
+        }else{
+            throw new Missing_ORM_Exception("There is no ORM object linked to this Entity instance");
         }
     }
 
@@ -249,6 +271,79 @@ abstract class Kohana_Entity{
         }
         $labels = $this->_orm->labels();
         return (isset($labels[$col])) ? $labels[$col] : '';
+    }
+
+    /**
+     * Get a list of properties from a relation
+     *
+     * @author  tspencer
+     * @param   string        $relation         Name of the Relationship to pull from
+     * @param   mixed         $properties       (String) Name of the property in the relationship
+     * @param                                   (Array)  Array of properties in the relationship
+     * @param   string        $delimiter        Glue for final string (defaults to ', ')
+     * @param   string        $format           Format of each list item (defaults to '%s')
+     * @return  string                          Final string containing the list
+     *****************************************************/
+    public function get_list($relation, $properties, $delimiter = ', ', $format = '%s') {
+        $list_str = '';
+        $list_arr = array();
+
+        /* Build the array of properties
+        //---------------------------------------*/
+        if(!is_array($properties)) {
+            $properties = array($properties);
+        }
+
+        foreach($this->$relation as $relation_single) {
+            /* Build the Item Values
+            //---------------------------------------*/
+            $item_values = array();
+            foreach($properties as $property) {
+                array_push($item_values, $relation_single->$property);
+            }
+
+            $list_item = vsprintf($format, $item_values);
+            array_push($list_arr, $list_item);
+        }
+        $list_str = implode($delimiter, $list_arr);
+        return $list_str;
+    }
+
+
+    public function orm(){
+        return $this->_orm;
+    }
+
+    /**
+     * get one of the db columns
+     * @deprecated
+     * @param string $col
+     * @return mixed 
+     */
+    public function get($col){
+        return (isset($this->{$col . '_col'})) ? ($this->{$col . '_col'}) : (false);
+    }
+    /**
+     * Stores old values for properties
+     * @deprecated
+     * @return mixed
+     */
+    public function val_history(){
+        return $this->val_history;
+    }
+
+    /*** Setters ***/
+    
+    /**
+     * set one of the db columns and store its previous value in $this->val_history
+     *
+     * @deprecated
+     * @param string $col
+     * @param mixed $val 
+     */
+    public function set($col, $val){
+        $this->val_history[$col] = $this->{$col . "_col"};
+        $this->{$col . "_col"} = $val;
     }
 }
 
