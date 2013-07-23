@@ -140,6 +140,7 @@ abstract class Kohana_Entity{
      */
     public function __call($name, $arguments){
         $success = false;
+        $convert_orm_to_entity = false;
 
         if(!$this->_orm){
             throw new Missing_ORM_Exception("There is no ORM object linked to this Entity instance");
@@ -152,6 +153,7 @@ abstract class Kohana_Entity{
                     throw new Entity_Call_Exception("The $name() method requires 2 arguments.");
                 }
                 $success = true;
+                $convert_orm_to_entity = true;
                 break;
             case "has":
             case "remove":
@@ -164,6 +166,7 @@ abstract class Kohana_Entity{
                 }
 
                 $success = true;
+                $convert_orm_to_entity = true;
                 break;
             case "loaded":
             case "pk": 
@@ -172,6 +175,16 @@ abstract class Kohana_Entity{
                 break;
             default :
                 throw new Entity_Call_Exception("The $name() method does not exist or is not supported.");
+        }
+
+        /* Convert Entity Arguments to ORM if needed
+        //---------------------------------------*/
+        if($convert_orm_to_entity) {
+            foreach($arguments as &$argument) {
+                if($argument instanceof Entity) {
+                    $argument = $argument->orm();
+                }
+            }
         }
 
         //if args are correct and we explicitly handle this function then we can pass the
@@ -216,21 +229,26 @@ abstract class Kohana_Entity{
             //---------------------------------------*/
             $this->_orm = $arg;
 
-        } else if(is_numeric($arg)) {
-
-            /* The Argument is an ID. Create the ORM object
+        } else if($arg) {
+            /* Argument is set, we assume that it's an ID of some sort (string or int)
             //---------------------------------------*/
-            // Get the ID
-            $id = filter_var($arg, FILTER_SANITIZE_NUMBER_INT);
-            // Set it
-            if($this->_orm && $id) { 
-                $this->_orm = new $this->_orm($id);
+            if($this->_orm && $arg) { 
+                $this->_orm = new $this->_orm($arg);
             }
 
-        } else if(!($this->_orm instanceof ORM)) {
+        } else {
             /* Argument is default, create a blank ORM
             //---------------------------------------*/
             $this->_orm = new $this->_orm();
+        }
+    }
+
+    public function values($post){
+        if($this->_orm){
+            $this->_orm->values($post);
+            return $this; // Chain the Entity, not the ORM object
+        }else{
+            throw new Missing_ORM_Exception("There is no ORM object linked to this Entity instance");
         }
     }
 
