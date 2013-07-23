@@ -147,10 +147,13 @@ class ORM extends Kohana_ORM {
         elseif (isset($this->_relations[$column]))
         {
             // If a callback exists, our plan is simple: Execute and return
-            $callback = $this->_relations[$column];
-            $this->_related[$column] = $this->$callback();
-            return $this->_related[$column] ;
-
+            if(isset($this->_relations[$column]['get'])) {
+                $callback = $this->_relations[$column]['get'];
+                $this->_related[$column] = $this->$callback();
+                return $this->_related[$column] ;
+            } else {
+                throw new ORM_Relation_Exception("Relations callback does not have 'get' method set");
+            }
         }
         elseif (isset($this->_belongs_to[$column]))
         {
@@ -213,7 +216,7 @@ class ORM extends Kohana_ORM {
                 }
             }
 
-            return $model->where($col, '=', $val);
+            return $model->where($col, '=', $val)->find_all();
         }
         else
         {
