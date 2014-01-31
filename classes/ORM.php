@@ -47,7 +47,7 @@ class ORM extends Kohana_ORM {
         $res = parent::find();
 
         if($this->entity_exists()){
-            $res = $this->entity($res);
+            $res = ($this->loaded()) ? ($this->entity($res)) : (false);
         }
 
         return $res;
