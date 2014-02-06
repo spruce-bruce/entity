@@ -235,7 +235,6 @@ abstract class Kohana_Entity{
             if($this->_orm && $arg) { 
                 $this->_orm = new $this->_orm($arg);
             }
-
         } else {
             /* Argument is default, create a blank ORM
             //---------------------------------------*/

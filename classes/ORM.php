@@ -18,27 +18,6 @@ class ORM extends Kohana_ORM {
     protected $_relations = array();
 
     /**
-     * Creates and returns a new model. If id is provided and an entity
-     * class exists for the model then factory() will return an entity
-     * object.
-     *
-     * @chainable
-     * @param   string  $model  Model name
-     * @param   mixed   $id     Parameter for find()
-     * @return  ORM
-     * @return  Entity
-     */
-    public static function factory($model, $id = NULL)
-    {
-        $res = parent::factory($model, $id);
-
-        if($id && ($entity = $res->entity($res))){
-            $res = $entity;
-        }
-        return $res;
-    }
-
-    /**
      * Finds and loads a single database row into the object.
      *
      * @return ORM or Entity
