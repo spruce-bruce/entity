@@ -171,6 +171,7 @@ abstract class Kohana_Entity{
             case "loaded":
             case "pk": 
             case "save":
+            case "delete":
                 $success = true;
                 break;
             default :
