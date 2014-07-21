@@ -40,7 +40,6 @@ abstract class Kohana_Entity{
      * @param mixed $arg - params for building the object
      */
     public function __construct($arg = false){
-        var_dump($arg); echo "<br /><br />";
 
         //set the orm class name
         $this->_orm = ($this->_orm) ? ($this->_orm) : ("Model_" . get_called_class());

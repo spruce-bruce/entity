@@ -89,7 +89,7 @@ class ORM extends Kohana_ORM {
     public function entity($objs = false){
         $entities = false;
         if($this->entity_exists()){
-            if($objs instanceof Database_MySQL_Result){
+            if($objs instanceof Database_Result){
                 $entities = array();
                 foreach($objs as $orm_obj){
                     $entities[] = new $this->_entity($orm_obj);
