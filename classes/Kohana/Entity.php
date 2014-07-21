@@ -33,6 +33,38 @@ abstract class Kohana_Entity{
     protected $_relationships = array();
 
     /**
+     * construct the entity object
+     *
+     * $arg will either be an array of values, an (int) id or an orm object
+     * 
+     * @param mixed $arg - params for building the object
+     */
+    public function __construct($arg = false){
+
+        //set the orm class name
+        $this->_orm = ($this->_orm) ? ($this->_orm) : ("Model_" . get_called_class());
+
+        /* Handle object creation depending on the type of ARG
+        //---------------------------------------*/
+        if($arg instanceof ORM){
+            /* The argument is ORM already. Set it and forget it
+            //---------------------------------------*/
+            $this->_orm = $arg;
+
+        } else if($arg) {
+            /* Argument is set, we assume that it's an ID of some sort (string or int)
+            //---------------------------------------*/
+            if($this->_orm && $arg) { 
+                $this->_orm = new $this->_orm($arg);
+            }
+        } else {
+            /* Argument is default, create a blank ORM
+            //---------------------------------------*/
+            $this->_orm = new $this->_orm();
+        }
+    }
+
+    /**
      * Returns an array of all the '_col' members. The keys will be the name
      * of the member with the '_col' chopped off the end.
      *
@@ -212,36 +244,7 @@ abstract class Kohana_Entity{
         return $relationship;
     }
 
-    /**
-     * construct the entity object
-     *
-     * $arg will either be an array of values, an (int) id or an orm object
-     * 
-     * @param mixed $arg - params for building the object
-     */
-    public function __construct($arg = false){
-        //set the orm class name
-        $this->_orm = ($this->_orm) ? ($this->_orm) : ("Model_" . get_called_class());
 
-        /* Handle object creation depending on the type of ARG
-        //---------------------------------------*/
-        if($arg instanceof ORM){
-            /* The argument is ORM already. Set it and forget it
-            //---------------------------------------*/
-            $this->_orm = $arg;
-
-        } else if($arg) {
-            /* Argument is set, we assume that it's an ID of some sort (string or int)
-            //---------------------------------------*/
-            if($this->_orm && $arg) { 
-                $this->_orm = new $this->_orm($arg);
-            }
-        } else {
-            /* Argument is default, create a blank ORM
-            //---------------------------------------*/
-            $this->_orm = new $this->_orm();
-        }
-    }
 
     public function values($post){
         if($this->_orm){
