@@ -18,42 +18,6 @@ class ORM extends Kohana_ORM {
     protected $_relations = array();
 
     /**
-     * Constructs a new model and loads a record if given
-     *
-     * @param   mixed $id Parameter for find or object to load
-     */
-    public function __construct($id = NULL)
-    {
-        $this->_initialize();
-
-        if ($id !== NULL)
-        {
-            if (is_array($id))
-            {
-                foreach ($id as $column => $value)
-                {
-                    // Passing an array of column => values
-                    $this->where($column, '=', $value);
-                }
-
-                parent::find();
-            }
-            else
-            {
-                // Passing the primary key
-                $this->where($this->_object_name.'.'.$this->_primary_key, '=', $id)->find();
-            }
-        }
-        elseif ( ! empty($this->_cast_data))
-        {
-            // Load preloaded data from a database call cast
-            $this->_load_values($this->_cast_data);
-
-            $this->_cast_data = array();
-        }
-    }
-
-    /**
      * Finds and loads a single database row into the object.
      *
      * @return ORM or Entity
